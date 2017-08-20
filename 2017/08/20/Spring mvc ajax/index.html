@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="ajax," />
 
 
 
@@ -57,17 +57,18 @@
 
 
 
-<meta name="description" content="do myself">
+<meta name="description" content="​     上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。">
+<meta name="keywords" content="ajax">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第一次来到这里">
-<meta property="og:url" content="http://yoursite.com/2017/08/12/第一次来到这里/index.html">
+<meta property="og:title" content="在Spring mvc中使用ajax">
+<meta property="og:url" content="http://yoursite.com/2017/08/20/Spring mvc ajax/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="do myself">
+<meta property="og:description" content="​     上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-12T06:50:55.143Z">
+<meta property="og:updated_time" content="2017-08-20T08:37:22.542Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="第一次来到这里">
-<meta name="twitter:description" content="do myself">
+<meta name="twitter:title" content="在Spring mvc中使用ajax">
+<meta name="twitter:description" content="​     上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。">
 
 
 
@@ -85,7 +86,7 @@
   };
 </script>
 
-  <title> 第一次来到这里 | Hexo </title>
+  <title> 在Spring mvc中使用ajax | Hexo </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -225,7 +226,7 @@
             
             
               
-                第一次来到这里
+                在Spring mvc中使用ajax
               
             
           </h1>
@@ -237,8 +238,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-08-12T14:50:55+08:00" content="2017-08-12">
-              2017-08-12
+            <time itemprop="dateCreated" datetime="2017-08-20T16:01:16+08:00" content="2017-08-20">
+              2017-08-20
             </time>
           </span>
 
@@ -264,7 +265,21 @@
       
 
       
-        
+        <blockquote>
+<p>​     上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。</p>
+</blockquote>
+<a id="more"></a>
+<p> 1.controller层接收ajax发送得请求数据</p>
+<p>​          在 controller层的方法中直接使用相应的参数名接收，和正常form表单提交的参数接收方法一样。比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">ajax</span><span class="params">(String oper,String name)</span></span>&#123;&#125;</div></pre></td></tr></table></figure>
+<p>2.发送json数据到jsp中的ajax函数</p>
+<p>​         在 controller层使用 <strong>@ResponseBody**</strong>，**直接发送字符串信息到jsp页面，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> jsondata.toString();</div></pre></td></tr></table></figure>
+<p>3.解决发送到jsp页面数据编码格式问题</p>
+<p>​        开始返回的数据在jsp显示是乱码，考虑到可能是编码格式的问题，查阅资料后，解决办法是需要在<strong>Springmvc</strong>配置文件中加入消息转换器，代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;mvc:annotation-driven &gt;</div><div class="line"></div><div class="line">    &lt;!-- 消息转换器 --&gt;</div><div class="line"></div><div class="line">    &lt;mvc:message-converters register-defaults=<span class="string">"true"</span>&gt;</div><div class="line"></div><div class="line">      &lt;bean <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.http.converter.StringHttpMessageConverter"</span>&gt;</div><div class="line"></div><div class="line">        &lt;property name=<span class="string">"supportedMediaTypes"</span> value=<span class="string">"text/html;charset=UTF-8"</span>/&gt;</div><div class="line"></div><div class="line">      &lt;/bean&gt;</div><div class="line"></div><div class="line">    &lt;/mvc:message-converters&gt;</div><div class="line"></div><div class="line">  &lt;/mvc:annotation-driven&gt;</div></pre></td></tr></table></figure>
+<p>后续———</p>
+
       
     </div>
 
@@ -275,6 +290,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ajax/" rel="tag">#ajax</a>
+          
+        </div>
       
 
       
@@ -348,6 +369,13 @@
 
           
 
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
