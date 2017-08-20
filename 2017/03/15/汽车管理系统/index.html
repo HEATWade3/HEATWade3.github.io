@@ -1,0 +1,613 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="技能点," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="最近总结了上一个项目中运用到的掌握不是很熟练的技能点，依次列举在下文，主要涉及对用户或管理员的权限管理、图片的上传和显示、页面请求数据接收时遇到的问题等。">
+<meta name="keywords" content="技能点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目总结：访问权限&amp;上传图片&amp;请求数据">
+<meta property="og:url" content="http://yoursite.com/2017/03/15/汽车管理系统/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="最近总结了上一个项目中运用到的掌握不是很熟练的技能点，依次列举在下文，主要涉及对用户或管理员的权限管理、图片的上传和显示、页面请求数据接收时遇到的问题等。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-20T13:21:06.979Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="项目总结：访问权限&amp;上传图片&amp;请求数据">
+<meta name="twitter:description" content="最近总结了上一个项目中运用到的掌握不是很熟练的技能点，依次列举在下文，主要涉及对用户或管理员的权限管理、图片的上传和显示、页面请求数据接收时遇到的问题等。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 项目总结：访问权限&上传图片&请求数据 | Hexo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?41fc030db57d5570dd22f78997dc4a7e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Hexo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                项目总结：访问权限&上传图片&请求数据
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-15T19:59:22+08:00" content="2017-03-15">
+              2017-03-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/项目总结/" itemprop="url" rel="index">
+                    <span itemprop="name">项目总结</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>  最近总结了上一个项目中运用到的掌握不是很熟练的技能点，依次列举在下文，主要涉及对用户或管理员的权限管理、图片的上传和显示、页面请求数据接收时遇到的问题等。</p>
+<a id="more"></a>
+<h4 id="访问权限设置"><a href="#访问权限设置" class="headerlink" title="访问权限设置"></a>访问权限设置</h4><p>​        首先根据登录缓存用户对象是否为空判断，若为空，跳转到登录登录界面；若不为空：在数据库中查询用户角色对应的权限菜单集合，判断此时访问的URL是否存在在集合中。</p>
+<p>​        注意：根据if(url.indexOf(menu.getUrl())!=-1)判断时，要保证数据库菜单表中的URL不能出现空的数据，不然会报空指针错误，权限拦截器不能正常处理。如果没有权限，拦截器拦截，返回页面并含有没有权限访问的提示信息。菜单表应当把全部的访问页面的URL存入，便于权限拦截处理。</p>
+<p>​        整个过程是使用了拦截器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/* 权限验证拦截器 */</span></div><div class="line"><span class="meta">@Component</span>(<span class="string">"purviewInterceptor"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PurviewInterceptor</span> <span class="keyword">extends</span> <span class="title">HandlerInterceptorAdapter</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="meta">@Resource</span></div><div class="line">	<span class="keyword">private</span> ICarService userservice;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span></span></div><div class="line"><span class="function">			<span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		System.out.println(<span class="string">"-------------进入拦截器----------------"</span>);</div><div class="line">		<span class="comment">// 获取当前登录的URL</span></div><div class="line">		String url = request.getRequestURL() + <span class="string">""</span>;</div><div class="line">		System.out.println(<span class="string">"登录url:"</span> + url);</div><div class="line"></div><div class="line">		<span class="comment">// 先获取登录时存入session中的登录用户 admin</span></div><div class="line">		HttpSession session = request.getSession();</div><div class="line">		Auser user = (Auser) session.getAttribute(<span class="string">"admin"</span>);</div><div class="line"></div><div class="line">		<span class="comment">// 判断登录用户是否为空，如果为空，直接返回没有权限信息 purview</span></div><div class="line">		<span class="keyword">if</span> (user == <span class="keyword">null</span>) &#123;</div><div class="line">			String purview = <span class="string">"---请登录后再访问---"</span>;</div><div class="line">			session.setAttribute(<span class="string">"purview"</span>, purview);</div><div class="line">			response.sendRedirect(request.getContextPath() + <span class="string">"/jsp/index.jsp"</span>);</div><div class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">		&#125;</div><div class="line">		<span class="comment">// 根据用户的类型id去查询具有的权限信息 (根据类型id，先查询中间表，然后查询出具有的菜单列表集合)</span></div><div class="line">   	    Map&lt;String, Object&gt; condMap = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</div><div class="line">		condMap.put(<span class="string">"id"</span>, user.getTypeId());</div><div class="line">		AuserType type = userservice.findAuserType(condMap);</div><div class="line">		List&lt;Amenu&gt; menulist = type.getMenulist();</div><div class="line"></div><div class="line">		<span class="comment">// 遍历查到的菜单列表，获取登录的URL，判断菜单列表中是否有这个URL (菜单列表中存放的url是项目名之后的部分字符串)</span></div><div class="line">		<span class="keyword">for</span> (Iterator iterator = menulist.iterator(); iterator.hasNext();) &#123;</div><div class="line">			Amenu menu = (Amenu) iterator.next();</div><div class="line">			System.out.println(<span class="string">"显示菜单信息：菜单名："</span> + menu.getName() + <span class="string">";url："</span> + menu.getUrl());</div><div class="line">			System.out.println(url.indexOf(menu.getUrl()));</div><div class="line">			<span class="keyword">if</span>(url.indexOf(menu.getUrl())!=-<span class="number">1</span>)&#123;</div><div class="line">				<span class="comment">//有权限</span></div><div class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">        </div><div class="line">		<span class="comment">// 没有权限,应该拦截 ( 继续向下执行方法 直接跳转)</span></div><div class="line">		response.setContentType(<span class="string">"text/html;charset=utf-8"</span>);</div><div class="line">		PrintWriter writer = response.getWriter();</div><div class="line">		writer.write(<span class="string">"您没有权限访问，请联系671829@qq.com"</span>);</div><div class="line">		writer.flush();</div><div class="line">		writer.close();</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​            同时需要在配置文件中加入拦截器的配置。(此处我是在Springmvc框架的配置文件中加入的拦截器声明)</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;!-- 拦截器（权限） --&gt;</div><div class="line">	&lt;mvc:interceptors&gt;</div><div class="line">		&lt;mvc:interceptor&gt;</div><div class="line">			&lt;mvc:mapping path=<span class="string">"/head/**"</span> /&gt;</div><div class="line">			&lt;ref bean=<span class="string">"purviewInterceptor"</span> /&gt;</div><div class="line"></div><div class="line">		&lt;/mvc:interceptor&gt;</div><div class="line"></div><div class="line">	&lt;/mvc:interceptors&gt;</div></pre></td></tr></table></figure>
+<h4 id="上传图片"><a href="#上传图片" class="headerlink" title="上传图片"></a>上传图片</h4><p>​         平常我们在网页中使用到类似于QQ头像关于图片信息的上传和显示。主要是将图片上传到服务器，同时生成图片的相对路径，存入数据库中的个人信息数据中。以下是在项目中关于图片上传和显示的整个过程，其中用到了json格式的配置文件，相比xml,properties格式的配置文件，json格式有更好的优点（此文暂不做对比）。</p>
+<h5 id="图片上传："><a href="#图片上传：" class="headerlink" title="图片上传："></a>图片上传：</h5><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;!--form表单以二进制流的方式提交 enctype=<span class="string">"multipart/form-data"</span>--&gt;</div><div class="line">  &lt;form <span class="class"><span class="keyword">class</span></span>=<span class="string">""</span> action=<span class="string">""</span> method=<span class="string">"post"</span>   enctype=<span class="string">"multipart/form-data"</span>&gt;</div><div class="line">&lt;input type=<span class="string">"file"</span> name=<span class="string">"photo"</span> id=<span class="string">"photo"</span> value=<span class="string">""</span> /&gt;</div><div class="line">  &lt;/form&gt;</div></pre></td></tr></table></figure>
+<h5 id="controller层接收图片"><a href="#controller层接收图片" class="headerlink" title="controller层接收图片:"></a>controller层接收图片:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/insertCar"</span>)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">insert</span><span class="params">( MultipartFile photo)</span> </span>&#123;</div><div class="line">	<span class="comment">/* 获取上传图片信息  参数中的photo要与form表单提交的name一样*/</span></div><div class="line">	String souname=photo.getOriginalFilename();</div><div class="line">	<span class="comment">/* </span></div><div class="line"><span class="comment">	 * 获取扩展名     数据库中存图片的扩展名   相对路径</span></div><div class="line"><span class="comment">	 * 相对路径：/file/car/日期/uuid.jpg</span></div><div class="line"><span class="comment">	 *  */</span></div><div class="line">	String relaPath=<span class="string">"/car"</span>+<span class="string">"/"</span>+<span class="keyword">new</span> DateUtil().dateToString(<span class="keyword">new</span> Date())+<span class="string">"/"</span>+</div><div class="line">	 UUID.randomUUID().toString()+souname.substring(souname.lastIndexOf(<span class="string">"."</span>), souname.length());</div><div class="line">	<span class="comment">/* 在数据库中存入图片的相对路径 */</span></div><div class="line">	car.setCarphoto(relaPath);</div><div class="line">	</div><div class="line">	<span class="comment">/* 获取文件中的真实路径内容 */</span></div><div class="line">	String truePath=ConstatFinalUtil.CONFIG_JSON.getString(<span class="string">"truePath"</span>);</div><div class="line">	String realPath=truePath+relaPath;</div><div class="line">	<span class="comment">/* 处理上传文件 */</span></div><div class="line">	File photo=<span class="keyword">new</span> File(realPath);</div><div class="line">	<span class="comment">/* 判断拼装的存储图片的路径的父目录是否存在  */</span></div><div class="line">	<span class="keyword">if</span>(!photo.getParentFile().exists())&#123;</div><div class="line">		photo.mkdirs();</div><div class="line">	&#125;</div><div class="line">	<span class="comment">/* 直接调用方法存储上传的照片文件 */</span></div><div class="line">	<span class="keyword">try</span> &#123;</div><div class="line">		photo2.transferTo(photo);</div><div class="line">	&#125; <span class="keyword">catch</span> (IllegalStateException | IOException e) &#123;</div><div class="line">		<span class="comment">// TODO Auto-generated catch block</span></div><div class="line">		System.out.println(<span class="string">"图片上传失败了！"</span>);</div><div class="line">		e.printStackTrace();</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">int</span> res = <span class="keyword">this</span>.userservice.insertCar(car);</div><div class="line">	System.out.println(<span class="string">"结果："</span> + res);</div><div class="line">	<span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中DateUtil时间处理的工具类</p>
+<h5 id="ConstatFinalUtil工具类读取json格式文件中存放的真实路径-FileUtil读取配置文件内容。"><a href="#ConstatFinalUtil工具类读取json格式文件中存放的真实路径-FileUtil读取配置文件内容。" class="headerlink" title="ConstatFinalUtil工具类读取json格式文件中存放的真实路径;FileUtil读取配置文件内容。"></a>ConstatFinalUtil工具类读取json格式文件中存放的真实路径;FileUtil读取配置文件内容。</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * 存储所有的常量类</span></div><div class="line"><span class="comment"> * <span class="doctag">@author</span> WangshSxt</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstatFinalUtil</span></span></div><div class="line"><span class="class"></span>&#123;</div><div class="line">	<span class="comment">/* 全局的静态的日志对象 */</span></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LogManager.getLogger();</div><div class="line">	<span class="comment">/* 日期时间格式化的默认格式 */</span></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> String DATE_TIME_PATTERN = <span class="string">"yyyy-MM-dd HH:mm:ss"</span> ; </div><div class="line">	</div><div class="line">	<span class="comment">/* JSON的配置文件 */</span></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> JSONObject SYSTEM_JSON = <span class="keyword">new</span> JSONObject() ;</div><div class="line">	<span class="comment">/* json配置文件中的config字段 */</span></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> JSONObject CONFIG_JSON = <span class="keyword">new</span> JSONObject() ; </div><div class="line"></div><div class="line">	</div><div class="line">	<span class="keyword">static</span>&#123;</div><div class="line">		<span class="comment">/* </span></div><div class="line"><span class="comment">		 * 从Classpath中获取json文件名 </span></div><div class="line"><span class="comment">		 * json文件需要放到这个类对应的classpath下：  src_common</span></div><div class="line"><span class="comment">		 * */</span></div><div class="line">		InputStream is=ConstatFinalUtil.class.getClassLoader().getResourceAsStream(<span class="string">"config.json"</span>);</div><div class="line">		FileUtil fu=<span class="keyword">new</span> FileUtil();</div><div class="line">		String result = fu.readFile(is);</div><div class="line">		ConstatFinalUtil.LOGGER.info(<span class="string">"json配置文件：&#123;&#125;"</span>,result);</div><div class="line">		<span class="comment">/* 将字符串转换为JSON对象 */</span></div><div class="line">		SYSTEM_JSON = (JSONObject) JSON.parse(result);</div><div class="line">		CONFIG_JSON = (JSONObject) SYSTEM_JSON.get(<span class="string">"config"</span>);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		System.out.println(<span class="string">"---------测试---------"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/* 读取文件的工具类 */</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileUtil</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="comment">/* 读取文件方法   返回字符串 */</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">readFile</span><span class="params">(InputStream is)</span></span>&#123;</div><div class="line">		<span class="comment">/* 凡是碰到字符串拼装,使用StringBuffer 需要将字符缓冲流读出的字符拼接*/</span></div><div class="line">		StringBuffer str=<span class="keyword">new</span> StringBuffer();</div><div class="line">		<span class="comment">/* 读取文件内容 */</span></div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			BufferedReader br=<span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(is, <span class="string">"utf-8"</span>));</div><div class="line">			String line=<span class="string">""</span>;</div><div class="line">			<span class="keyword">while</span>((line=br.readLine())!=<span class="keyword">null</span>)&#123;</div><div class="line">				<span class="comment">/* 字符串拼装读取到的文件内容 */</span></div><div class="line">				str.append(line);</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">			<span class="comment">// TODO Auto-generated catch block</span></div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> str.toString();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>（1）存储时的路径处理是：真实路径是向服务器中存放图片的地址，是在工具类ConstatFinalUtil中处理获得：首先：在json格式文件中存入图片的真实地址，然后在工具类中使用静态代码块使用类加载器获取配置文件输入流（json文件应该放到工具类同一个src_目录下），调用工具类FileUtil获得文件内容，最后将字符串信息存入JSONObject对象中，赋值给CONFIG_JSON属性,用于controll层使用。</p>
+<p>（2）controller层获取图片的扩展名。相对路径：/file/car/日期/uuid.jpg,其中car层的文件夹用于分类，uuid可以更好的避免存入同名图片，覆盖的情况。</p>
+<p>（3）服务器中存储的路径是：真实路径+相对路径；数据库中图片地址信息是：相对路径。</p>
+<h5 id="页面显示图片"><a href="#页面显示图片" class="headerlink" title="页面显示图片"></a>页面显示图片</h5><p>   此处是根据获取到的图片的相对路径地址读取服务器中的图片，只需要在jsp中写相应的地址即可，比如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;img src="$&#123;rootPath&#125;/file/$&#123;car.carphoto&#125;" class="" style="width:250px;height:150px;"/&gt;&lt;/td&gt;</div></pre></td></tr></table></figure>
+<p>在显示图片中加入   class=”img-circle” 可以显示圆形图片。</p>
+<h4 id="controller层获取请求数据遇到的类型问题"><a href="#controller层获取请求数据遇到的类型问题" class="headerlink" title="controller层获取请求数据遇到的类型问题"></a>controller层获取请求数据遇到的类型问题</h4><p>问题：   controller层从jsp页面form表单中获取到的都是String类型，如果在controller方法中参数接收的是int,DATE型，可能会出现404错误：</p>
+<p>（1）查询时form表单提交的int型数据为空，参数接收时出错，因为传来的是null，接收的是整型</p>
+<p>（2）Date型需要将字符串日期，用String型接收后转换一下格式</p>
+<p>解决：（1.）如果是添加页面，提交的全部内容全不能为空（全都有值）的情况下且没有Date格式数据的情况下，可以使用对象作为参数去接收；</p>
+<p>​            （2.）如果是查询或者更新页面，直接使用String类型参数，单个去接收。（在方法中使用多个String类型的参数）</p>
+<h4 id="数据库表多对多的处理"><a href="#数据库表多对多的处理" class="headerlink" title="数据库表多对多的处理"></a>数据库表多对多的处理</h4><p> 应当使用中间表解决多对多关系，但是不用对中间表建实体类、mapper和Dao层，</p>
+<p>解决：比如根据角色查询拥有的多个菜单时</p>
+<p>角色表中添加菜单的List集合属性，Mapper 文件中使用resultmap为   collection为List集合属性赋值，去查询角色表的Mapper中的查询操作</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技能点/" rel="tag">#技能点</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/20/Spring mvc ajax/" rel="prev" title="在Spring mvc中使用ajax">
+                在Spring mvc中使用ajax <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LW" />
+          <p class="site-author-name" itemprop="name">LW</p>
+          <p class="site-description motion-element" itemprop="description">do myself</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#访问权限设置"><span class="nav-number">1.</span> <span class="nav-text">访问权限设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#上传图片"><span class="nav-number">2.</span> <span class="nav-text">上传图片</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#图片上传："><span class="nav-number">2.1.</span> <span class="nav-text">图片上传：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#controller层接收图片"><span class="nav-number">2.2.</span> <span class="nav-text">controller层接收图片:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ConstatFinalUtil工具类读取json格式文件中存放的真实路径-FileUtil读取配置文件内容。"><span class="nav-number">2.3.</span> <span class="nav-text">ConstatFinalUtil工具类读取json格式文件中存放的真实路径;FileUtil读取配置文件内容。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#页面显示图片"><span class="nav-number">2.4.</span> <span class="nav-text">页面显示图片</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#controller层获取请求数据遇到的类型问题"><span class="nav-number">3.</span> <span class="nav-text">controller层获取请求数据遇到的类型问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库表多对多的处理"><span class="nav-number">4.</span> <span class="nav-text">数据库表多对多的处理</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LW</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

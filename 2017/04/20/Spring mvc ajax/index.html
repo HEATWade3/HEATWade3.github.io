@@ -65,7 +65,7 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="​           上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-20T09:13:20.869Z">
+<meta property="og:updated_time" content="2017-08-20T13:20:25.593Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Spring mvc中使用ajax">
 <meta name="twitter:description" content="​           上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。">
@@ -269,11 +269,11 @@
 <p>​           上个汽车管理系统项目，在使用ssh框架做完之后，由于是后台系统，没有用到ajax，所有今天自己在Eclipse上创建了一个动态网页项目，测试使用了JSON传送数据和jsp页面使用ajax，以下总结了相比servlet，在使用ssh框架中遇到的一些问题。</p>
 </blockquote>
 <a id="more"></a>
-<h4 id="1-controller层接收ajax发送得请求数据"><a href="#1-controller层接收ajax发送得请求数据" class="headerlink" title="1.controller层接收ajax发送得请求数据"></a>1.controller层接收ajax发送得请求数据</h4><p>​          在 controller层的方法中直接使用相应的参数名接收，和正常form表单提交的参数接收方法一样。比如：</p>
+<h4 id="controller层接收ajax发送得请求数据"><a href="#controller层接收ajax发送得请求数据" class="headerlink" title="controller层接收ajax发送得请求数据"></a>controller层接收ajax发送得请求数据</h4><p>​          在 controller层的方法中直接使用相应的参数名接收，和正常form表单提交的参数接收方法一样。比如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">ajax</span><span class="params">(String oper,String name)</span></span>&#123;&#125;</div></pre></td></tr></table></figure>
-<h4 id="2-发送json数据到jsp中的ajax函数"><a href="#2-发送json数据到jsp中的ajax函数" class="headerlink" title="2.发送json数据到jsp中的ajax函数"></a>2.发送json数据到jsp中的ajax函数</h4><p>​         在 controller层使用 <strong>@ResponseBody**</strong>，**直接发送字符串信息到jsp页面，比如：</p>
+<h4 id="发送json数据到jsp中的ajax函数"><a href="#发送json数据到jsp中的ajax函数" class="headerlink" title="发送json数据到jsp中的ajax函数"></a>发送json数据到jsp中的ajax函数</h4><p>​         在 controller层使用 <strong>@ResponseBody**</strong>，**直接发送字符串信息到jsp页面，比如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> jsondata.toString();</div></pre></td></tr></table></figure>
-<h4 id="3-解决发送到jsp页面数据编码格式问题"><a href="#3-解决发送到jsp页面数据编码格式问题" class="headerlink" title="3.解决发送到jsp页面数据编码格式问题"></a>3.解决发送到jsp页面数据编码格式问题</h4><p>​        开始返回的数据在jsp显示是乱码，考虑到可能是编码格式的问题，查阅资料后，解决办法是需要在<strong>Springmvc</strong>配置文件中加入消息转换器，代码如下：</p>
+<h4 id="解决发送到jsp页面数据编码格式问题"><a href="#解决发送到jsp页面数据编码格式问题" class="headerlink" title="解决发送到jsp页面数据编码格式问题"></a>解决发送到jsp页面数据编码格式问题</h4><p>​        开始返回的数据在jsp显示是乱码，考虑到可能是编码格式的问题，查阅资料后，解决办法是需要在<strong>Springmvc</strong>配置文件中加入消息转换器，代码如下：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;mvc:annotation-driven &gt;</div><div class="line"></div><div class="line">    &lt;!-- 消息转换器 --&gt;</div><div class="line"></div><div class="line">    &lt;mvc:message-converters register-defaults=<span class="string">"true"</span>&gt;</div><div class="line"></div><div class="line">      &lt;bean <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.http.converter.StringHttpMessageConverter"</span>&gt;</div><div class="line"></div><div class="line">        &lt;property name=<span class="string">"supportedMediaTypes"</span> value=<span class="string">"text/html;charset=UTF-8"</span>/&gt;</div><div class="line"></div><div class="line">      &lt;/bean&gt;</div><div class="line"></div><div class="line">    &lt;/mvc:message-converters&gt;</div><div class="line"></div><div class="line">  &lt;/mvc:annotation-driven&gt;</div></pre></td></tr></table></figure>
 <p>后续———</p>
 
@@ -298,6 +298,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/15/汽车管理系统/" rel="next" title="项目总结：访问权限&上传图片&请求数据">
+                <i class="fa fa-chevron-left"></i> 项目总结：访问权限&上传图片&请求数据
+              </a>
             
           </div>
 
@@ -373,7 +377,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -381,7 +385,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -390,7 +394,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -450,7 +454,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-controller层接收ajax发送得请求数据"><span class="nav-number">1.</span> <span class="nav-text">1.controller层接收ajax发送得请求数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-发送json数据到jsp中的ajax函数"><span class="nav-number">2.</span> <span class="nav-text">2.发送json数据到jsp中的ajax函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-解决发送到jsp页面数据编码格式问题"><span class="nav-number">3.</span> <span class="nav-text">3.解决发送到jsp页面数据编码格式问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#controller层接收ajax发送得请求数据"><span class="nav-number">1.</span> <span class="nav-text">controller层接收ajax发送得请求数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送json数据到jsp中的ajax函数"><span class="nav-number">2.</span> <span class="nav-text">发送json数据到jsp中的ajax函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决发送到jsp页面数据编码格式问题"><span class="nav-number">3.</span> <span class="nav-text">解决发送到jsp页面数据编码格式问题</span></a></li></ol></div>
             
           </div>
         </section>
