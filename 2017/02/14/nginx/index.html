@@ -1,0 +1,662 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Nginx服务," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="​           nginx是用于反向代理的服务器，它是一个程序转发请求，是一个网站服务。">
+<meta name="keywords" content="Nginx服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx">
+<meta property="og:url" content="http://yoursite.com/2017/02/14/nginx/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​           nginx是用于反向代理的服务器，它是一个程序转发请求，是一个网站服务。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx3.png">
+<meta property="og:updated_time" content="2017-08-27T02:34:06.420Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nginx">
+<meta name="twitter:description" content="​           nginx是用于反向代理的服务器，它是一个程序转发请求，是一个网站服务。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Nginx | Hexo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?41fc030db57d5570dd22f78997dc4a7e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Hexo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Nginx
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-14T13:11:33+08:00" content="2017-02-14">
+              2017-02-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/服务器/" itemprop="url" rel="index">
+                    <span itemprop="name">服务器</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>​           nginx是用于反向代理的服务器，它是一个程序转发请求，是一个网站服务。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="简述Nginx的作用"><a href="#简述Nginx的作用" class="headerlink" title="简述Nginx的作用"></a>简述Nginx的作用</h4><p>​        程序员开发的服务上线,放到linux系统上面,服务器要7*24小时,不能关机,服务永不宕机，如果开发的服务,放到linux里面的tomcat,升级服务先停掉tomcat,将写的程序web服务重新放到webapps中,启动tomcat。升级过程中tomcat停止的时间这期间用户无法访问服务,这样肯定会影响用户的使用和体验。</p>
+<p>​         所以，需要系统升级的时候得保证用户使用服务不宕机,服务器维护或故障的时候，停止tomcat不能让用户感觉到。使用nginx后可以做到这一点，需要配置多个服务器，每个服务器中放置相同的项目。用户访问时先访问ngin，由nginx分配决定去访问哪一个服务器，同时，当多个服务器某个出现异常情况时，nginx不会转发用户请求到该服务器。</p>
+<p>​         这样，nginx可以降低单个服务器的负载，降低高并发，保证Linux系统上的服务器端能一直工作（即使是出现维护、故障的情况）。</p>
+<p><img src="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx1.png" alt="image"></p>
+<h4 id="Linux系统安装Nginx"><a href="#Linux系统安装Nginx" class="headerlink" title="Linux系统安装Nginx"></a>Linux系统安装Nginx</h4><p>1.yum源安装</p>
+<p>   （1） 文件名<strong>:nginx.repo</strong></p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[nginx]</div><div class="line">name=nginx repo</div><div class="line">baseurl=http://nginx.org/packages/centos/6/<span class="formula">$basearch/</span></div><div class="line"><span class="formula">gpgcheck=0</span></div><div class="line"><span class="formula">enabled=1</span></div></pre></td></tr></table></figure>
+<p>​    将yum源放到/etc/yum.repos.d下面;</p>
+<p>​    （2）安装：yum install nginx；</p>
+<p>​    （3）启动服务：service nginx restart</p>
+<p>​               停止服务：service nginx restart(stop|start|reload)</p>
+<p>2.tar包安装</p>
+<p>   （1）安装依赖gcc-c++、zlib-devel、pcre-devel</p>
+<p>   yum install gcc-c++ zlib-devel pcre-devel -y</p>
+<p>   （2）解压、配置与检测</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">tar zxvf nginx-1.8.1.tar.gz </div><div class="line">cd nginx-1.8.1</div><div class="line">mkdir -p /usr/local/nginx</div><div class="line">./configure --prefix=/usr/local/nginx</div></pre></td></tr></table></figure>
+<p>  （3） 编译安装：make &amp;&amp; make install</p>
+<p>  （4）启动 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/nginx</div><div class="line">sbin/nginx</div></pre></td></tr></table></figure>
+<p>   (5)测试</p>
+<p>​    浏览器输入装nginx的IP地址即可，会显示Welcome to nginx 的页面</p>
+<h4 id="请求转发到服务器"><a href="#请求转发到服务器" class="headerlink" title="请求转发到服务器"></a>请求转发到服务器</h4><p>用户只访问nginx,由nginx将请求转到后面的tomcat,到底是tomcat_1还是tomcat_2,或者tomcat_3或者tomcat_4,由nginx自己决定。</p>
+<p>修改nginx配置文件<strong>default.conf</strong>（在conf.d/目录下）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"># 转发模块</div><div class="line">upstream docs</div><div class="line">&#123;</div><div class="line">#同一个浏览器在指定的时间内访问的tomcat是同一个 ,server 对应的就是tomcat Ip和端口号</div><div class="line">ip_hash;</div><div class="line"># ip:端口</div><div class="line">    server 127.0.0.1:10001;</div><div class="line">    server 127.0.0.1:10004;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line"></div><div class="line">    #charset koi8-r;</div><div class="line">    #access_log  /var/log/nginx/host.access.log  main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">        index  index.html index.htm;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h4 id="如何在一个linux系统上同时运行多个tomcat服务器"><a href="#如何在一个linux系统上同时运行多个tomcat服务器" class="headerlink" title="如何在一个linux系统上同时运行多个tomcat服务器"></a>如何在一个linux系统上同时运行多个tomcat服务器</h4><h4 id="文件服务器"><a href="#文件服务器" class="headerlink" title="文件服务器"></a>文件服务器</h4><p>​       使用linux系统时，会通过一些镜像网站下载资源，基本是通过nginx服务器来服务的。下面介绍一下如何利用nginx的特性做一个文件服务器（和下面的文件上传相似），从而可以通过浏览器端访问下载自己上传的资源。</p>
+<p>1.修改配置文件default.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line"></div><div class="line">    #charset koi8-r;</div><div class="line">    #access_log  /var/log/nginx/host.access.log  main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">        index  index.html index.htm;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    # file下载文件目录,file表示url目录</div><div class="line">    location /file &#123;</div><div class="line">        #列出目录结构</div><div class="line">        autoindex   on;</div><div class="line">        #文件大小</div><div class="line">        autoindex_exact_size    on;</div><div class="line">        #文件的修改时间</div><div class="line">        autoindex_localtime on;</div><div class="line">        #默认提供的显示目录</div><div class="line">        root   /data/savefile;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>让配置文件生效</li>
+</ol>
+<p>​        Service nginx restart(重启)</p>
+<p>​        nginx -t(检查一下配置文件是否有错),nginx -s reload(重新加载配置文件的内容)</p>
+<p>​         配置文件中的root目录和地址/file可以修改；</p>
+<p>​       为了配合下载站,如果显示目录不存在需要创建，同时在显示目录/data/savefile下面创建一个file目录，用来存       </p>
+<p>​       放上传的文件。</p>
+<p>3.访问</p>
+<p>浏览器访问url地址为：<strong>nginx服务器IP/file/</strong></p>
+<p> 会显示出file目录下的所有文件，点击的时候,浏览器会尝试打开此类型的文件,如果能够打开,直接就打开,如果打不开,就弹出一个下载框,让你下载。</p>
+<h4 id="vsftp上传文件，通过Nginx服务器存储和访问"><a href="#vsftp上传文件，通过Nginx服务器存储和访问" class="headerlink" title="vsftp上传文件，通过Nginx服务器存储和访问"></a>vsftp上传文件，通过Nginx服务器存储和访问</h4><p><img src="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx2.png" alt="image"></p>
+<p>原因：原因：传统的文件上传，无法正常访问图片。</p>
+<p>1.安装<strong>vsftpd</strong></p>
+<p>yum install vsftpd</p>
+<p>2.创建用于文件上传的用户（Nginx服务器上）</p>
+<p>创建用户：useradd ftpuser</p>
+<p>设置密码：password ftpuser</p>
+<p>3设置selinux</p>
+<p>selinux是美国国家安全局与scc联合开发的安全组件。</p>
+<p>设置命令：setsebool -P xxx on</p>
+<p>查看：getsebool -a | grep ftp</p>
+<p><img src="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/nginx3.png" alt="image"></p>
+<p>4.修改nginx.conf配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#用户：</div><div class="line">user ftpuser</div><div class="line"></div><div class="line"></div><div class="line">#上传文件的地址</div><div class="line">location / &#123;</div><div class="line">        root   /home/ftpuser/www/;</div><div class="line">        index  index.html index.htm;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>​      （1）检测配置文件正确性</p>
+<p>​      cd /usr/local/nginx</p>
+<p>​      sbin/nginx  -t -c conf/nginx.conf</p>
+<p>​      如果出现 Ok,successful表示正确。</p>
+<p>​     （2）浏览器访问路径   </p>
+<p>​          URL：IP/目录/存储文件名</p>
+<p>​          其中目录是配置文件中设置的root下的目录</p>
+<p>5.java代码执行上传</p>
+<p>工具类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.InputStream;</div><div class="line"><span class="keyword">import</span> java.io.Serializable;</div><div class="line"><span class="keyword">import</span> java.net.SocketException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.commons.net.ftp.FTP;</div><div class="line"><span class="keyword">import</span> org.apache.commons.net.ftp.FTPClient;</div><div class="line"></div><div class="line"><span class="comment">/* vsftpd上传文件的工具类 */</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FtpUtil</span> <span class="keyword">implements</span> <span class="title">Serializable</span></span>&#123;</div><div class="line">	</div><div class="line">	<span class="comment">/**</span></div><div class="line"><span class="comment">	 * </span></div><div class="line"><span class="comment">	 */</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">2474723015297507377L</span>;</div><div class="line">	<span class="keyword">private</span> FTPClient client=<span class="keyword">null</span>;</div><div class="line">	<span class="keyword">private</span> String hostReal=<span class="keyword">null</span>;</div><div class="line">	</div><div class="line">	<span class="comment">/* 登录client username为root建的用户*/</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(String host,Integer port,String username, String password)</span> <span class="keyword">throws</span> SocketException, IOException</span>&#123;</div><div class="line">		hostReal=host;</div><div class="line">		client=<span class="keyword">new</span> FTPClient();</div><div class="line">		<span class="comment">/* 1.链接vsftp */</span></div><div class="line">		client.connect(host, port);</div><div class="line">		<span class="comment">/* 2.登录 */</span></div><div class="line">		client.login(username, password);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">/* 文件上传 */</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">fileUpLoad</span><span class="params">(String basepath,String pathname,InputStream local,String remote)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">		<span class="comment">/* 3.设置上传目录,则创建目录 一次只能创建一级目录 */</span></div><div class="line">		String tempath=<span class="string">"/"</span>;</div><div class="line">		String[] pathArr = (basepath+<span class="string">"/"</span>+pathname).split(<span class="string">"/"</span>);</div><div class="line">		<span class="keyword">for</span> (String path : pathArr) &#123;</div><div class="line">			tempath+=path+<span class="string">"/"</span>;</div><div class="line">			<span class="keyword">boolean</span> exit=client.changeWorkingDirectory(tempath);</div><div class="line">			<span class="keyword">if</span>(!exit)&#123;</div><div class="line">				client.makeDirectory(tempath);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="comment">/*4.指定上传目标路径 返回false表示路径不存在*/</span></div><div class="line">		client.changeWorkingDirectory(basepath+<span class="string">"/"</span>+pathname);</div><div class="line">		<span class="comment">/* 5.指定文件上传格式，二进制 */</span></div><div class="line">		client.setFileType(FTP.BINARY_FILE_TYPE);</div><div class="line">		<span class="comment">/* 6.执行上传本地文件，io流方式上传 ，需要InputStream参数 */</span></div><div class="line">		client.storeFile(remote, local);</div><div class="line">		<span class="comment">/* 7.退出 */</span></div><div class="line">        client.logout();</div><div class="line">        <span class="comment">/* 8.关闭连接 */</span></div><div class="line">        client.disconnect();</div><div class="line">        <span class="comment">/* 返回图片的访问地址 */</span></div><div class="line">        <span class="keyword">return</span> <span class="string">"http://"</span>+hostReal+<span class="string">"/"</span>+pathname+<span class="string">"/"</span>+remote;</div><div class="line"></div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>controller层执行文件上传</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.Date;</div><div class="line"><span class="keyword">import</span> java.util.HashMap;</div><div class="line"><span class="keyword">import</span> java.util.Map;</div><div class="line"><span class="keyword">import</span> java.util.UUID;</div><div class="line"></div><div class="line"><span class="keyword">import</span> javax.annotation.Resource;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Value;</div><div class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</div><div class="line"><span class="keyword">import</span> org.springframework.web.multipart.MultipartFile;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.google.gson.Gson;</div><div class="line"><span class="keyword">import</span> com.sxt.util.DateUtil;</div><div class="line"><span class="keyword">import</span> com.sxt.util.FtpUtil;</div><div class="line"></div><div class="line"><span class="meta">@Controller</span></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/pic"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PictureController</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="meta">@Value</span>(<span class="string">"$&#123;ftp.host&#125;"</span>)</div><div class="line">	String host;</div><div class="line">	<span class="meta">@Value</span>(<span class="string">"$&#123;ftp.port&#125;"</span>)</div><div class="line">	<span class="keyword">int</span> port;</div><div class="line">	<span class="meta">@Value</span>(<span class="string">"$&#123;ftp.username&#125;"</span>)</div><div class="line">	String username;</div><div class="line">	<span class="meta">@Value</span>(<span class="string">"$&#123;ftp.password&#125;"</span>)</div><div class="line">	String password;</div><div class="line">	<span class="meta">@Value</span>(<span class="string">"$&#123;ftp.basePath&#125;"</span>)</div><div class="line">	String basepath;</div><div class="line">	</div><div class="line">	<span class="comment">/* 文件上传 */</span></div><div class="line">	<span class="meta">@RequestMapping</span>(<span class="string">"/upload"</span>)</div><div class="line">	<span class="meta">@ResponseBody</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">fileUpLoad</span><span class="params">(MultipartFile uploadFile)</span></span>&#123;</div><div class="line">		System.out.println(<span class="string">"地址参数"</span>+host+<span class="string">";"</span>+port);</div><div class="line">		DateUtil dutil=<span class="keyword">new</span> DateUtil();</div><div class="line">		FtpUtil ftp=<span class="keyword">new</span> FtpUtil();</div><div class="line">		Map&lt;String,Object&gt; result=<span class="keyword">new</span> HashMap&lt;String,Object&gt;();</div><div class="line">		String pathname=dutil.toString(<span class="keyword">new</span> Date(), <span class="string">"yyyy/MM/dd"</span>);</div><div class="line">		<span class="comment">/* 上传文件的原始文件名 */</span></div><div class="line">		String filename=uploadFile.getOriginalFilename();</div><div class="line">		<span class="comment">/* 获取文件后缀 */</span></div><div class="line">		String suffix=filename.substring(filename.lastIndexOf(<span class="string">"."</span>));</div><div class="line">		System.out.println(<span class="string">"文件后缀:"</span>+suffix);</div><div class="line">		String remote=UUID.randomUUID()+suffix;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			<span class="comment">/* 登录 */</span></div><div class="line">			ftp.login(host, port, username, password);</div><div class="line">			<span class="comment">/* 执行文件上传 */</span></div><div class="line">			String url = ftp.fileUpLoad(basepath, pathname, uploadFile.getInputStream(),remote );</div><div class="line">			System.out.println(<span class="string">"url:"</span>+url);</div><div class="line">			result.put(<span class="string">"error"</span>, <span class="number">0</span>);</div><div class="line">			result.put(<span class="string">"url"</span>, url);</div><div class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">			result.put(<span class="string">"error"</span>, <span class="number">1</span>);</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		Gson gson=<span class="keyword">new</span> Gson();</div><div class="line">		<span class="keyword">return</span> gson.toJson(result);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx服务/" rel="tag">#Nginx服务</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/13/dubbo/" rel="next" title="Dubbo服务框架">
+                <i class="fa fa-chevron-left"></i> Dubbo服务框架
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/15/集群总结/" rel="prev" title="总结nginx、zookeeper集群、dubbo、dubbo-monitor、mycat、redis集群等">
+                总结nginx、zookeeper集群、dubbo、dubbo-monitor、mycat、redis集群等 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LW" />
+          <p class="site-author-name" itemprop="name">LW</p>
+          <p class="site-description motion-element" itemprop="description">do myself</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#简述Nginx的作用"><span class="nav-number">1.</span> <span class="nav-text">简述Nginx的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux系统安装Nginx"><span class="nav-number">2.</span> <span class="nav-text">Linux系统安装Nginx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求转发到服务器"><span class="nav-number">3.</span> <span class="nav-text">请求转发到服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何在一个linux系统上同时运行多个tomcat服务器"><span class="nav-number">4.</span> <span class="nav-text">如何在一个linux系统上同时运行多个tomcat服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件服务器"><span class="nav-number">5.</span> <span class="nav-text">文件服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vsftp上传文件，通过Nginx服务器存储和访问"><span class="nav-number">6.</span> <span class="nav-text">vsftp上传文件，通过Nginx服务器存储和访问</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LW</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+</body>
+</html>
