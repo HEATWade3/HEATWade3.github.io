@@ -1,0 +1,606 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="redis集群缓存数据," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="​          redis集群可以缓存mybatsi查询到数据，降低数据库的查询次数。本文重点介绍如何通过redis集群缓存sql语句查询到的数据，便于下次相同的sql语句查询不用通过查询数据库而在redis集群缓存中获取。">
+<meta name="keywords" content="redis集群缓存数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="service实现类使用redis集群缓存数据">
+<meta property="og:url" content="http://yoursite.com/2017/04/20/程序使用redis集群/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​          redis集群可以缓存mybatsi查询到数据，降低数据库的查询次数。本文重点介绍如何通过redis集群缓存sql语句查询到的数据，便于下次相同的sql语句查询不用通过查询数据库而在redis集群缓存中获取。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-29T04:58:39.095Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="service实现类使用redis集群缓存数据">
+<meta name="twitter:description" content="​          redis集群可以缓存mybatsi查询到数据，降低数据库的查询次数。本文重点介绍如何通过redis集群缓存sql语句查询到的数据，便于下次相同的sql语句查询不用通过查询数据库而在redis集群缓存中获取。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> service实现类使用redis集群缓存数据 | Hexo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?41fc030db57d5570dd22f78997dc4a7e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Hexo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                service实现类使用redis集群缓存数据
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-20T16:01:16+08:00" content="2017-04-20">
+              2017-04-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技能学习/" itemprop="url" rel="index">
+                    <span itemprop="name">技能学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>​          redis集群可以缓存mybatsi查询到数据，降低数据库的查询次数。本文重点介绍如何通过redis集群缓存sql语句查询到的数据，便于下次相同的sql语句查询不用通过查询数据库而在redis集群缓存中获取。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="redis集群如何实现支持事务"><a href="#redis集群如何实现支持事务" class="headerlink" title="redis集群如何实现支持事务"></a>redis集群如何实现支持事务</h4><p>1.单个redis支持弱事物、redisCluster集群是不支持的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* 单个redis支持弱事务（可以数据回滚） */</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OneRedis</span> </span>&#123;</div><div class="line">    <span class="meta">@Test</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">redisTest</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">		<span class="comment">/* 链接redis */</span></div><div class="line">		Jedis jedis=<span class="keyword">new</span> Jedis(<span class="string">"192.168.109.66"</span>,<span class="number">1</span> );</div><div class="line">		Transaction tx=<span class="keyword">null</span>;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			<span class="comment">/* 开启事务 */</span></div><div class="line">			tx = jedis.multi();</div><div class="line">			tx.set(<span class="string">"name"</span>, <span class="string">"LBJ"</span>);</div><div class="line">			tx.set(<span class="string">"email"</span>, <span class="string">"132342"</span>);</div><div class="line">			tx.set(<span class="string">"address"</span>, <span class="string">"bjsxt"</span>);</div><div class="line">			</div><div class="line">			<span class="comment">//int i=1/0;</span></div><div class="line">			<span class="comment">//提交事务</span></div><div class="line">			tx.exec();</div><div class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">			<span class="comment">/* 数据回滚 */</span></div><div class="line">			tx.discard();</div><div class="line">		&#125;<span class="keyword">finally</span>&#123;</div><div class="line">			tx.close();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.redis集群事务处理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line">/* </div><div class="line"> * redis集群是不支持事务的，</div><div class="line"> * 集群的每个节点，是支持事物的，通过key获取到对应的节点，</div><div class="line"> * 通过每个节点对事物进行管理</div><div class="line"> * */</div><div class="line">public class RedisClusterTest &#123;</div><div class="line"></div><div class="line">	/* 测试 */</div><div class="line">	@Test</div><div class="line">	public void clusterTest() throws IOException &#123;</div><div class="line">         /* 节点集合 */</div><div class="line">		HostAndPort node1=new HostAndPort(&quot;192.168.109.66&quot;,10079);</div><div class="line">		HostAndPort node2=new HostAndPort(&quot;192.168.109.66&quot;,10080);</div><div class="line">		HostAndPort node3=new HostAndPort(&quot;192.168.109.66&quot;,10081);</div><div class="line">		HostAndPort node4=new HostAndPort(&quot;192.168.109.66&quot;,10082);</div><div class="line">		HostAndPort node5=new HostAndPort(&quot;192.168.109.66&quot;,10083);</div><div class="line">		HostAndPort node6=new HostAndPort(&quot;192.168.109.66&quot;,10083);</div><div class="line">		Set&lt;HostAndPort&gt; nodes=new HashSet&lt;HostAndPort&gt;();</div><div class="line">		JedisCluster jediss=new JedisCluster(nodes);</div><div class="line">		/* 根据key调用方法，获取节点 */</div><div class="line">		String key=&quot;姓名&quot;;</div><div class="line">		Jedis jedis = getNodeByKey(jediss,key);</div><div class="line">		Transaction tx=null;</div><div class="line">		/* 开启事务 */</div><div class="line">		try &#123;</div><div class="line">			tx = jedis.multi();</div><div class="line">			tx.set(key, &quot;在哪里&quot;);</div><div class="line">			//int i=1/0;</div><div class="line">			//提交事务</div><div class="line">			tx.exec();</div><div class="line">		&#125; catch (Exception e) &#123;</div><div class="line">			/* 数据回滚 */</div><div class="line">			tx.discard();</div><div class="line">		&#125;finally&#123;</div><div class="line">			tx.close();</div><div class="line">		&#125;</div><div class="line">		System.out.println(jedis.get(key));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/* 根据key 获取该键值对在集群中（哈希槽）应该存放的节点 */</div><div class="line">	public Jedis getNodeByKey(JedisCluster cluster, String key) &#123;</div><div class="line"></div><div class="line">		boolean flag = false;</div><div class="line">		/* 如果key不存在，则临时添加 */</div><div class="line">		if (!cluster.exists(key)) &#123;</div><div class="line">			cluster.set(key, &quot;&quot;);</div><div class="line">			flag = true;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		/* 获取集群所有的节点 ，遍历，去查找key对应的节点 */</div><div class="line">		Map&lt;String, JedisPool&gt; clusterNodes = cluster.getClusterNodes();</div><div class="line">		for (Entry&lt;String, JedisPool&gt; nodes : clusterNodes.entrySet()) &#123;</div><div class="line">			JedisPool jedisPool = nodes.getValue();</div><div class="line">			Jedis jedis = jedisPool.getResource();</div><div class="line"></div><div class="line">			try &#123;</div><div class="line">				/* 判断当前key是否所属当前节点 */</div><div class="line">				if (jedis.exists(key)) &#123;</div><div class="line">					/* key如果在集群中没有对应的value，会报错，所以在前面为key赋值，最后会删除 */</div><div class="line">					if (flag) &#123;</div><div class="line">						/* 根据falg 删除临时添加的key */</div><div class="line">						cluster.del(key);</div><div class="line">					&#125;</div><div class="line">					return jedis;</div><div class="line">				&#125;</div><div class="line">			&#125; catch (Exception e) &#123;</div><div class="line"></div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		/* 删除临时添加的key */</div><div class="line">		if (flag) &#123;</div><div class="line">			cluster.del(key);</div><div class="line">		&#125;</div><div class="line">		return null;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="Service实现类实现redis集群缓存数据"><a href="#Service实现类实现redis集群缓存数据" class="headerlink" title="Service实现类实现redis集群缓存数据"></a>Service实现类实现redis集群缓存数据</h4><p>以下采用前台页面获取商品列表的例子通过代码说明redis集群如何缓存数据</p>
+<p>1.redis集群配置文件</p>
+<p>redis节点的地址和端口存储在properties文件中</p>
+<p>applicationContext-redis.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></div><div class="line"><span class="tag">	<span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></div><div class="line"><span class="tag">	<span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></span></div><div class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/beans/spring-beans.xsd</span></span></div><div class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/context</span></span></div><div class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/context/spring-context.xsd</span></span></div><div class="line"><span class="tag"><span class="string">      "</span>&gt;</span></div><div class="line">	<span class="comment">&lt;!-- redis 6节点 --&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node1"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node1.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node1.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line"></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node2"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node2.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node2.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node3"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node3.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node3.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node4"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node4.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node4.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node5"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node5.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node5.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"node6"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.HostAndPort"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"host"</span> <span class="attr">value</span>=<span class="string">"$&#123;node6.host&#125;"</span> /&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"port"</span> <span class="attr">value</span>=<span class="string">"$&#123;node6.port&#125;"</span> /&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line"></div><div class="line">	<span class="comment">&lt;!-- 注入jedisCluster对象 --&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"jedisCluster"</span> <span class="attr">class</span>=<span class="string">"redis.clients.jedis.JedisCluster"</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"nodes"</span>&gt;</span></div><div class="line">			<span class="tag">&lt;<span class="name">set</span>&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node1"</span> /&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node2"</span> /&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node3"</span> /&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node4"</span> /&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node5"</span> /&gt;</span></div><div class="line">				<span class="tag">&lt;<span class="name">ref</span> <span class="attr">bean</span>=<span class="string">"node6"</span> /&gt;</span></div><div class="line">			<span class="tag">&lt;/<span class="name">set</span>&gt;</span></div><div class="line">		<span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>2.Service实现类存储和获取缓存数据</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* 前台页面显示商品分类</span></div><div class="line"><span class="comment">	 * 使用redis集群缓存</span></div><div class="line"><span class="comment">	 *  */</span></div><div class="line">	<span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> List&lt;GoodsCategoryResult&gt; <span class="title">findAll</span><span class="params">(Short pid, Byte level)</span></span>&#123;</div><div class="line">		<span class="comment">//创建集合存储返回结果</span></div><div class="line">		List&lt;GoodsCategoryResult&gt; result=<span class="keyword">null</span>;</div><div class="line">		<span class="comment">//从redis中查询，看是否有存储</span></div><div class="line">		<span class="keyword">byte</span>[] category = jedisClu.get(SerializationUtils.serialize(<span class="string">"商品类型"</span>));</div><div class="line">		<span class="keyword">if</span>(category!=<span class="keyword">null</span> &amp;&amp; category.length&gt;<span class="number">0</span>)&#123;</div><div class="line">			<span class="comment">//redis缓存中存储了数据</span></div><div class="line">			result=(List&lt;GoodsCategoryResult&gt;)SerializationUtils.deserialize(category);</div><div class="line">		&#125;<span class="keyword">else</span>&#123;</div><div class="line">			<span class="comment">//如果第一次查询，需要查询数据库</span></div><div class="line">			result= findAllByMsql(pid,level);</div><div class="line">			<span class="comment">//将结果存储到redis集群中</span></div><div class="line">			jedisClu.set(SerializationUtils.serialize(<span class="string">"商品类型"</span>),SerializationUtils.serialize(result) );</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> result;</div><div class="line">		</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h4 id="如何利用Mybatis缓存通过redis集群存储数据（重点）"><a href="#如何利用Mybatis缓存通过redis集群存储数据（重点）" class="headerlink" title="如何利用Mybatis缓存通过redis集群存储数据（重点）"></a>如何利用Mybatis缓存通过redis集群存储数据（重点）</h4>
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis集群缓存数据/" rel="tag">#redis集群缓存数据</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/15/汽车管理系统/" rel="next" title="项目总结：访问权限&上传图片&请求数据">
+                <i class="fa fa-chevron-left"></i> 项目总结：访问权限&上传图片&请求数据
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/20/Spring mvc ajax/" rel="prev" title="在Spring mvc中使用ajax">
+                在Spring mvc中使用ajax <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LW" />
+          <p class="site-author-name" itemprop="name">LW</p>
+          <p class="site-description motion-element" itemprop="description">do myself</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#redis集群如何实现支持事务"><span class="nav-number">1.</span> <span class="nav-text">redis集群如何实现支持事务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service实现类实现redis集群缓存数据"><span class="nav-number">2.</span> <span class="nav-text">Service实现类实现redis集群缓存数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何利用Mybatis缓存通过redis集群存储数据（重点）"><span class="nav-number">3.</span> <span class="nav-text">如何利用Mybatis缓存通过redis集群存储数据（重点）</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LW</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+</body>
+</html>

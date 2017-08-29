@@ -1,0 +1,662 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="redis缓存," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="​           redis用于缓存数据库查询的数据，避免相同的查询数据多次访问数据库查询。本文主要介绍redis如何在服务器端安装集群。">
+<meta name="keywords" content="redis缓存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis集群">
+<meta property="og:url" content="http://yoursite.com/2017/02/12/redis安装/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​           redis用于缓存数据库查询的数据，避免相同的查询数据多次访问数据库查询。本文主要介绍redis如何在服务器端安装集群。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/redis1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/redis2.png">
+<meta property="og:updated_time" content="2017-08-29T04:22:50.154Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis集群">
+<meta name="twitter:description" content="​           redis用于缓存数据库查询的数据，避免相同的查询数据多次访问数据库查询。本文主要介绍redis如何在服务器端安装集群。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/redis1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> redis集群 | Hexo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?41fc030db57d5570dd22f78997dc4a7e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Hexo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                redis集群
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-12T16:01:16+08:00" content="2017-02-12">
+              2017-02-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/服务器/" itemprop="url" rel="index">
+                    <span itemprop="name">服务器</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>​           redis用于缓存数据库查询的数据，避免相同的查询数据多次访问数据库查询。本文主要介绍redis如何在服务器端安装集群。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="redis介绍"><a href="#redis介绍" class="headerlink" title="redis介绍"></a>redis介绍</h4><p>Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。</p>
+<p>redis存储数据是通过键值对的形式存储。</p>
+<p>它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Map), 列表(list), 集合(sets) 和 有序集合(sorted sets)等类型。</p>
+<p>特点：</p>
+<p>Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。<br>Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。<br>Redis支持数据的备份，即master-slave模式的数据备份。</p>
+<h4 id="redis流程图"><a href="#redis流程图" class="headerlink" title="redis流程图"></a>redis流程图</h4><p><img src="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/redis1.png" alt="image"> </p>
+<h4 id="redis服务器端安装"><a href="#redis服务器端安装" class="headerlink" title="redis服务器端安装"></a>redis服务器端安装</h4><p>本文中介绍的redis的服务器端安装使用的是3.2.8</p>
+<p>下载地址：<a href="http://219.238.4.195/files/205900000535EC21/download.redis.io/releases/redis-3.2.8.tar.gz" target="_blank" rel="external">http://219.238.4.195/files/205900000535EC21/download.redis.io/releases/redis-3.2.8.tar.gz</a></p>
+<h5 id="1-redis单机安装"><a href="#1-redis单机安装" class="headerlink" title="1.redis单机安装"></a>1.redis单机安装</h5><p>此处示例安装在/data/redis/目录下</p>
+<p>（1.）解压安装包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /data/</div><div class="line">tar -xzf redis-3.2.8.tar.gz</div><div class="line">mv  redis-3.2.8 /data/redis/</div></pre></td></tr></table></figure>
+<p>（2.）安装C++的编译环境</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum -y install gcc</div></pre></td></tr></table></figure>
+<p>（3.）安装</p>
+<p>在redis解压文件夹目录下，执行安装命令</p>
+<p>如果不指定路径，默认会安装到/usr/local/bin目录下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make install</div></pre></td></tr></table></figure>
+<p>下面安装集群时，安装在新创建的setup目录下，PREFIX指定安装地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make PREFIX=/data/redisCluster/setup/    install</div></pre></td></tr></table></figure>
+<p>（4.）运行</p>
+<p>必须创建data所需要的目录</p>
+<p>my_redis.conf是默认的配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir /data/redis/data</div><div class="line">redis  /data/redis/redis-3.2.8/src/redis-server  /data/redis/my_redis.conf</div></pre></td></tr></table></figure>
+<h5 id="2-安装redis集群"><a href="#2-安装redis集群" class="headerlink" title="2.安装redis集群"></a>2.安装redis集群</h5><p>（1.）解压tar包在/data/redisCluster/目录下,创建setup目录，安装在该目录下（命令见单机安装第三步）。</p>
+<p>（2.）安装ruby、ruby-gems环境 </p>
+<p>Redis集群模块是Ruby写的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install ruby rubygems</div></pre></td></tr></table></figure>
+<p>（3.）为redis安装ruby接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gem install redis --version 3.0.6</div></pre></td></tr></table></figure>
+<p>（4.）创建配置、数据、日志文件目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir -p /data/redisCluster/conf</div><div class="line">mkdir -p /data/redisCluster/data</div><div class="line">mkdir -p /data/redisCluster/log</div></pre></td></tr></table></figure>
+<p>（5.）添加集群配置文件（此处使用的redis集群有6个redis）</p>
+<p>​    1.&gt;     复制/data/redisCluster/redis-3.2.8/目录下的redis.conf文件，改名为redis-common.conf,修改改文件内容（每行第一个数字为文件中的行数，#为需要注释当前行）：</p>
+<p>redis-common.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">61       bind 0.0.0.0</div><div class="line">84       #port 6379</div><div class="line">128      daemonize yes</div><div class="line">150      #pidfile /var/run/redis_6379.pid</div><div class="line">163      #logfile &quot;&quot;</div><div class="line">237      #dbfilename dump.rdb</div><div class="line">         #dir目录对应创建的数据目录</div><div class="line">247      dir /data/redisCluster/data</div><div class="line">597      #appendfilename &quot;appendonly.aof&quot;</div><div class="line">721      cluster-enabled yes</div><div class="line">812      cluster-require-full-coverage no</div></pre></td></tr></table></figure>
+<p>  2.&gt;   创建6个集群的配置文件</p>
+<p>  ：redis-10079.conf，redis-10080.conf，redis-10081.conf，redis-10082.confredis-10083.conf，redis-10084.conf</p>
+<p>示例：redis-10084.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#引用redis-common</div><div class="line">include /data/redisCluster/conf/redis-common.conf</div><div class="line">#端口  </div><div class="line">port 10084</div><div class="line">#记录进程号</div><div class="line">pidfile /var/run/redis_10084.pid</div><div class="line">#日志文件</div><div class="line">logfile &quot;/data/redisCluster/log/redis_10084.log&quot;</div><div class="line">#自动持久化的追加文件</div><div class="line">dbfilename dump_10084.rdb</div><div class="line">appendfilename &quot;appendonly_10084.aof&quot;</div><div class="line">#集群自动生成配置文件</div><div class="line">cluster-config-file nodes-10084.conf</div></pre></td></tr></table></figure>
+<p>复制6份，只需修改端口号即可。</p>
+<p>3.&gt; 添加配置文件</p>
+<p>将集群配置文件（1+6）移动至/data/redisCluster/conf目录下</p>
+<p>（6.）启动集群服务（启动6个redis服务）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">cd /data/redisCluster/redis-3.2.8</div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10079.conf </div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10080.conf </div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10081.conf </div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10082.conf </div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10083.conf </div><div class="line">/data/redisCluster/setup/bin/redis-server /data/redisCluster/conf/redis-10084.conf</div></pre></td></tr></table></figure>
+<p>查看启动集群状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure>
+<p>（7.） 通过ruby脚本管理创建集群</p>
+<p>复制src目录下的redis-trib.rb文件至/data/redisCluster/setup/bin(安装目录)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /data/redisCluster/redis-3.2.8/src</div><div class="line">cp redis-trib.rb /data/redisCluster/setup/bin/</div></pre></td></tr></table></figure>
+<p>（8.）创建集群</p>
+<p>对应的是ip和6个设定的redis端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/data/redisCluster/setup/bin/redis-trib.rb  create --replicas 1 192.168.88.10:10079 192.168.88.10:10080 192.168.88.10:10081 192.168.88.10:10082 192.168.88.10:10083 192.168.88.10:10084</div></pre></td></tr></table></figure>
+<p>创建成功</p>
+<p><img src="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/redis2.png" alt="image"> </p>
+<p>（9.）检测、测试存储数据</p>
+<p>检测</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/data/redisCluster/setup/bin/redis-trib.rb check 192.168.88.10:6384</div></pre></td></tr></table></figure>
+<p>测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/data/redisCluster/setup/bin/redis-cli -c -p 10079</div></pre></td></tr></table></figure>
+<p>-c表示cluster，已集群方式连接</p>
+<p>-p表示port，用于指定连接端口</p>
+<p>进入10079端口对应的redis</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">set name &quot;lw&quot;</div><div class="line">get name</div></pre></td></tr></table></figure>
+<p>获取结果是lw，表示redis存储正常</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis缓存/" rel="tag">#redis缓存</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/10/mycat/" rel="next" title="Mycat、Mysql使用">
+                <i class="fa fa-chevron-left"></i> Mycat、Mysql使用
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/13/dubbo/" rel="prev" title="Dubbo服务框架">
+                Dubbo服务框架 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LW" />
+          <p class="site-author-name" itemprop="name">LW</p>
+          <p class="site-description motion-element" itemprop="description">do myself</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#redis介绍"><span class="nav-number">1.</span> <span class="nav-text">redis介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis流程图"><span class="nav-number">2.</span> <span class="nav-text">redis流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis服务器端安装"><span class="nav-number">3.</span> <span class="nav-text">redis服务器端安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-redis单机安装"><span class="nav-number">3.1.</span> <span class="nav-text">1.redis单机安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-安装redis集群"><span class="nav-number">3.2.</span> <span class="nav-text">2.安装redis集群</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LW</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+</body>
+</html>
