@@ -71,7 +71,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/dubbo4.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/dubbo5.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/HEATWade3/HEATWade3.github.io/master/images/dubbo6.png">
-<meta property="og:updated_time" content="2017-08-27T05:45:26.514Z">
+<meta property="og:updated_time" content="2017-08-30T23:46:49.593Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo服务框架">
 <meta name="twitter:description" content="​           本文主要介绍dubbo的作用，dubbo的工作机制，其中涉及到的注册中心（本文介绍zookeeper注册中心集群）、监控中心。">
@@ -353,6 +353,7 @@
 <h5 id="运行服务"><a href="#运行服务" class="headerlink" title="运行服务"></a>运行服务</h5><p>1.开启zookeeper注册中心服务（必须）</p>
 <p>2.开启监控中心服务</p>
 <p>3.执行生产者main方法，开启生产者服务</p>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>使用duubbo时需要对pojo类和工具类实现序列化接口，Serializable。</p>
 
       
     </div>
@@ -454,7 +455,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">13</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -462,7 +463,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -471,7 +472,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -531,7 +532,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dubbo的作用"><span class="nav-number">1.</span> <span class="nav-text">Dubbo的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dubbo的工作机制"><span class="nav-number">2.</span> <span class="nav-text">Dubbo的工作机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册中心集群-zookeeper集群"><span class="nav-number">3.</span> <span class="nav-text">注册中心集群(zookeeper集群)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#zookeeper单机安装"><span class="nav-number">3.1.</span> <span class="nav-text">zookeeper单机安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zookeeper集群的安装-此处使用3个"><span class="nav-number">3.2.</span> <span class="nav-text">zookeeper集群的安装(此处使用3个)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#监控中心"><span class="nav-number">4.</span> <span class="nav-text">监控中心</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#安装监控中心"><span class="nav-number">4.1.</span> <span class="nav-text">安装监控中心</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#安装管理控制台"><span class="nav-number">4.2.</span> <span class="nav-text">安装管理控制台</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#程序"><span class="nav-number">5.</span> <span class="nav-text">程序</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#运行服务"><span class="nav-number">5.1.</span> <span class="nav-text">运行服务</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dubbo的作用"><span class="nav-number">1.</span> <span class="nav-text">Dubbo的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dubbo的工作机制"><span class="nav-number">2.</span> <span class="nav-text">Dubbo的工作机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册中心集群-zookeeper集群"><span class="nav-number">3.</span> <span class="nav-text">注册中心集群(zookeeper集群)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#zookeeper单机安装"><span class="nav-number">3.1.</span> <span class="nav-text">zookeeper单机安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zookeeper集群的安装-此处使用3个"><span class="nav-number">3.2.</span> <span class="nav-text">zookeeper集群的安装(此处使用3个)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#监控中心"><span class="nav-number">4.</span> <span class="nav-text">监控中心</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#安装监控中心"><span class="nav-number">4.1.</span> <span class="nav-text">安装监控中心</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#安装管理控制台"><span class="nav-number">4.2.</span> <span class="nav-text">安装管理控制台</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#程序"><span class="nav-number">5.</span> <span class="nav-text">程序</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#运行服务"><span class="nav-number">5.1.</span> <span class="nav-text">运行服务</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意"><span class="nav-number">6.</span> <span class="nav-text">注意</span></a></li></ol></div>
             
           </div>
         </section>

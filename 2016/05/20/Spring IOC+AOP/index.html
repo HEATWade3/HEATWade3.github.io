@@ -1,0 +1,634 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="spring," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="​           本文主要讲解Spring的原理，注解的使用部分后面文章中会有代码讲解。">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring IOC、AOP原理讲解">
+<meta property="og:url" content="http://yoursite.com/2016/05/20/Spring IOC+AOP/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​           本文主要讲解Spring的原理，注解的使用部分后面文章中会有代码讲解。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-11T13:11:40.393Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring IOC、AOP原理讲解">
+<meta name="twitter:description" content="​           本文主要讲解Spring的原理，注解的使用部分后面文章中会有代码讲解。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Spring IOC、AOP原理讲解 | Hexo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?41fc030db57d5570dd22f78997dc4a7e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Hexo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring IOC、AOP原理讲解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-20T16:01:16+08:00" content="2016-05-20">
+              2016-05-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>​           本文主要讲解Spring的原理，注解的使用部分后面文章中会有代码讲解。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="Spring-IOC"><a href="#Spring-IOC" class="headerlink" title="Spring IOC"></a>Spring IOC</h4><p>​       控制反转IOC（Inversion of Control）是一种设计思想，DI（dependency injection）依赖注入是实现IOC一种方法。在使用Spring IOC之前，在程序中我们使用面向对象编程时对象的创建与对象间的依赖关系体现在：对象的创建、对象属性赋值等由程序自己控制，控制反转后：将对象的创建、属性赋值等转移给第三方Spring。所以，个人认为所谓控制反转就是：获得依赖对象的方式反转了。</p>
+<p>​       举例说明：一个类需要用到某个接口的方法，我们需要将类 A和接口 B的实现关联起来，最简单的方法是类 A中创建一个对于接口 B的实现 C的实例，但这种方法显然两者的依赖（ Dependency）太大了。而 IoC 的方法是只<br>在类 A中定义好用于关联接口 B的实现的方法， 将类 A，接口 B和接口 B的实现 C放入 IoC 的 容器（Container ）<br>中，通过一定的配置由容器（ Container ）来实现类 A与接口 B的实现 C的关联。</p>
+<p>​       IOC是Spring框架的核心内容。实现IOC，可以使用xml配置和使用注解的方式。Spring容器在初始化时先读取配置文件，根据配置文件或元数据创建与组织对象存入容器中，程序中使用时再从IOC容器中取出需要的对象。</p>
+<p>​       采用XML方式配置Bean的时候，Bean的定义信息是和实现分离的，而采用注解的方式可以把两者合为一体，Bean的定义信息直接以注解的形式定义在实现类中，从而达到了零配置的目的。</p>
+<p>下面举例使用配置文件XML方式配置Bean：</p>
+<p>SSM框架中连接数据库</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;!-- SPring中配置链接数据库的数据源 ：驱动，URL，用户名，密码 --&gt;</div><div class="line">	&lt;bean id=<span class="string">"dataSource"</span></div><div class="line">		<span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.datasource.DriverManagerDataSource"</span>&gt;</div><div class="line">		&lt;!-- 驱动 --&gt;</div><div class="line">		&lt;property name=<span class="string">"driverClassName"</span> value=<span class="string">"com.mysql.jdbc.Driver"</span> /&gt;</div><div class="line">		&lt;!-- url --&gt;</div><div class="line">		&lt;property name=<span class="string">"url"</span> value=<span class="string">"jdbc:mysql://localhost:3306/car?useSSL=true"</span> /&gt;</div><div class="line">		&lt;!-- 用户名 --&gt;</div><div class="line">		&lt;property name=<span class="string">"username"</span> value=<span class="string">"root"</span> /&gt;</div><div class="line">		&lt;!-- 密码 --&gt;</div><div class="line">		&lt;property name=<span class="string">"password"</span> value=<span class="string">"1234"</span> /&gt;</div><div class="line">	&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<p>​    通过bean标签为创建数据源对象，通过property标签为数据源对象的属性赋值。</p>
+<h4 id="自动装配"><a href="#自动装配" class="headerlink" title="自动装配"></a>自动装配</h4><p>  通过自动装配，可以可以省去property标签,自定义引用类型。</p>
+<p> 在xml中通过以下方式开启自动装配</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">default</span>-autowire=<span class="string">"byName"</span></div><div class="line">  </div><div class="line">  &lt;bean id=<span class="string">"transactionManager"</span></div><div class="line">		<span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</div><div class="line">		&lt;!-- 自动装配，为数据源属性赋值 ：dataSource --&gt;</div><div class="line">		&lt;!-- &lt;property name=<span class="string">"dataSource"</span> ref=<span class="string">"dataSource"</span>/&gt; --&gt;</div><div class="line">	&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<p>注解中@Autowired是根据类型进行自动装配的，@Autowired 可以对成员变量、方法以及构造函数进行注释，@Autowired 注释进行自动注入时，Spring 容器中匹配的候选 Bean 数目必须有。</p>
+<h4 id="Spring-AOP"><a href="#Spring-AOP" class="headerlink" title="Spring AOP"></a>Spring AOP</h4><p>​       AOP（Aspect Oriented Programming）面向切面编程，通过预编译方式和运行期动态代理实现程序功能的横向多模块统一控制的一种技术。AOP是Spring框架中的一个重要内容。利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。AOP可以分为静态织入与动态织入，静态织入即在编译前将需织入内容写入目标模块中，这样成本非常高。动态织入则不需要改变目标模块。Spring框架实现了AOP，使用注解配置完成AOP比使用XML配置要更加方便与直观。</p>
+<p><strong>Spring对AOP的支持</strong></p>
+<p>Spring中AOP代理由Spring的IOC容器负责生成、管理，其依赖关系也由IOC容器负责管理。因此，AOP代理可以直接使用容器中的其它bean实例作为目标，这种关系可由IOC容器的依赖注入提供。Spring创建代理的规则为：</p>
+<p>1、默认使用Java动态代理来创建AOP代理，这样就可以为任何接口实例创建代理了</p>
+<p>2、需要代理的类不是代理接口的时候，Spring会切换为使用CGLIB代理，也可强制使用CGLIB</p>
+<p>AOP编程其实是很简单的事情，纵观AOP编程，程序员只需要参与三个部分：</p>
+<p>1、定义普通业务组件</p>
+<p>2、定义切入点，一个切入点可能横切多个业务组件</p>
+<p>3、定义增强处理，增强处理就是在AOP框架为普通业务组件织入的处理动作</p>
+<p>所以进行AOP编程的关键就是定义切入点和定义增强处理，一旦定义了合适的切入点和增强处理，AOP框架将自动生成AOP代理，即：代理对象的方法=增强处理+被代理对象的方法。</p>
+<p>​       Spring AOP 默认使用标准的 JDK 动态代理(dynamic proxy)技术来实现 AOP 代理, 通过它, 我们可以为任意的接口实现代理。如果需要为一个类实现代理, 那么可以使用 CGLIB 代理。当一个业务逻辑对象没有实现接口时, 那么Spring AOP 就默认使用 CGLIB 来作为 AOP 代理了。 即如果我们需要为一个方法织入 advice, 但是这个方法不是一个接口所提供的方法, 则此时 Spring AOP 会使用 CGLIB 来实现动态代理.。鉴于此, Spring AOP 建议基于接口编程, 对接口进行 AOP 而不是类。</p>
+<p> AOP的基本概念</p>
+<p>(1)Aspect(切面):通常是一个类，里面可以定义切入点和通知</p>
+<p>(2)JointPoint(连接点):程序执行过程中明确的点，一般是方法的调用</p>
+<p>(3)Advice(通知):AOP在特定的切入点上执行的增强处理，有before,after,afterReturning,afterThrowing,around</p>
+<p>(4)Pointcut(切入点):就是带有通知的连接点，在程序中主要体现为书写切入点表达式</p>
+<p>通知类型：</p>
+<p>(1)Before（前置通知）:在目标方法被调用之前做增强处理,@Before只需要指定切入点表达式即可</p>
+<p>(2)AfterReturning（返回通知）:在目标方法正常完成后做增强,@AfterReturning除了指定切入点表达式后，还可以指定一个返回值形参名returning,代表目标方法的返回值</p>
+<p>(3)AfterThrowing（异常通知）:主要用来处理程序中未处理的异常,@AfterThrowing除了指定切入点表达式后，还可以指定一个throwing的返回值形参名,可以通过该形参名</p>
+<p>来访问目标方法中所抛出的异常对象</p>
+<p>(4)After（后置通知）:在目标方法完成之后做增强，无论目标方法时候成功完成。@After可以指定一个切入点表达式</p>
+<p>(5)Around（环绕通知）:环绕通知,在目标方法完成前后做增强处理,环绕通知是最重要的通知类型,像事务,日志等都是环绕通知,注意编程中核心是一个ProceedingJoinPoint</p>
+<p>下面举例说明应用：</p>
+<p>事务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">&lt;!-- 事务管理配置开始 --&gt;</div><div class="line">	&lt;!-- 事务管理器 --&gt;</div><div class="line">	&lt;bean id=<span class="string">"transactionManager"</span></div><div class="line">		<span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</div><div class="line">		&lt;!-- 自动装配，为数据源属性赋值 ：dataSource --&gt;</div><div class="line">		&lt;!-- &lt;property name=<span class="string">"dataSource"</span> ref=<span class="string">"dataSource"</span>/&gt; --&gt;</div><div class="line">	&lt;/bean&gt;</div><div class="line"></div><div class="line">	&lt;!-- 事务管理器的通知类型 那些方法开事务，那些方法不开事务 transaction-manager：需要一个事务管理器(上面) --&gt;</div><div class="line">	&lt;tx:advice id=<span class="string">"txAdvice"</span> transaction-manager=<span class="string">"transactionManager"</span>&gt;</div><div class="line">		&lt;tx:attributes&gt;</div><div class="line">			&lt;!-- propagation:传播特性.把事务加到Service中的所有的方法, REQUIRED:是ServiceA和ServiceB共用一个事务,如果其中的任何一个方法抛异常了,整体全都回滚 --&gt;</div><div class="line">			&lt;tx:method name=<span class="string">"save*"</span> propagation=<span class="string">"REQUIRED"</span></div><div class="line">				rollback-<span class="keyword">for</span>=<span class="string">"java.lang.Exception"</span> /&gt;</div><div class="line">			&lt;tx:method name=<span class="string">"update*"</span> propagation=<span class="string">"REQUIRED"</span></div><div class="line">				rollback-<span class="keyword">for</span>=<span class="string">"java.lang.Exception"</span> /&gt;</div><div class="line">			&lt;tx:method name=<span class="string">"insert*"</span> propagation=<span class="string">"REQUIRED"</span></div><div class="line">				rollback-<span class="keyword">for</span>=<span class="string">"java.lang.Exception"</span> /&gt;</div><div class="line">			&lt;tx:method name=<span class="string">"delete*"</span> propagation=<span class="string">"REQUIRED"</span></div><div class="line">				rollback-<span class="keyword">for</span>=<span class="string">"java.lang.Exception"</span> /&gt;</div><div class="line">			&lt;!-- 其它的方法不开启事务 read-only:只能读操作,如果有写操作,会报错 --&gt;</div><div class="line">			&lt;tx:method name=<span class="string">"*"</span> read-only=<span class="string">"true"</span> /&gt;</div><div class="line">		&lt;/tx:attributes&gt;</div><div class="line">	&lt;/tx:advice&gt;</div><div class="line"></div><div class="line">	&lt;!-- 配置到AOP上去 --&gt;</div><div class="line">	&lt;aop:config&gt;</div><div class="line">		&lt;!-- aop:pointcut:切入点，那些类里面的那些方法执行通知里面的方法 --&gt;</div><div class="line">		&lt;aop:pointcut expression=<span class="string">"execution (* com.bjsxt.*.service.imp.*.*(..))"</span></div><div class="line">			id=<span class="string">"pointcut"</span> /&gt;</div><div class="line">		&lt;!-- 织入:就是将通知类型和切入点关联起来 advice-ref:通知类型 pointcut-ref:切入点 --&gt;</div><div class="line">		&lt;aop:advisor advice-ref=<span class="string">"txAdvice"</span> pointcut-ref=<span class="string">"pointcut"</span> /&gt;</div><div class="line">	&lt;/aop:config&gt;</div><div class="line">	&lt;!-- 事务管理器配置结束 --&gt;</div></pre></td></tr></table></figure>
+<p>下面网址对应的是一个关于AOP在日志记录中的使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://jinnianshilongnian.iteye.com/blog/1418596</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring/" rel="tag">#spring</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/15/linux/" rel="next" title="Linux命令总结">
+                <i class="fa fa-chevron-left"></i> Linux命令总结
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/05/maven/" rel="prev" title="Maven">
+                Maven <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LW" />
+          <p class="site-author-name" itemprop="name">LW</p>
+          <p class="site-description motion-element" itemprop="description">do myself</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring-IOC"><span class="nav-number">1.</span> <span class="nav-text">Spring IOC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自动装配"><span class="nav-number">2.</span> <span class="nav-text">自动装配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring-AOP"><span class="nav-number">3.</span> <span class="nav-text">Spring AOP</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LW</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+</body>
+</html>
